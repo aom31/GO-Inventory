@@ -8,3 +8,7 @@ type Item struct {
 	Description string             `bson:"description" json:"description"`
 	Damage      float64            `bson:"damage" json:"damage"`
 }
+
+type ItemId struct {
+	ObjectId primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
+}

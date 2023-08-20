@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/aom31/GO-Inventory/config"
+	httphandler "github.com/aom31/GO-Inventory/handler/httpHandler"
+	"github.com/aom31/GO-Inventory/src/repository"
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -35,6 +37,9 @@ func NewHttpServer(cfg *config.Config, dbClient *mongo.Client) IHttpServer {
 }
 
 func (serv *httpServer) StartHttpServer() {
+	//setup
+	serv.RouteHttpHandle()
+
 	log.Printf("starting server http with app url: %s", serv.cfg.App.Url)
 
 	// Start server
@@ -54,4 +59,17 @@ func (serv *httpServer) StartHttpServer() {
 	if err := serv.app.Shutdown(ctx); err != nil {
 		serv.app.Logger.Fatal(err)
 	}
+}
+
+func (serv *httpServer) RouteHttpHandle() {
+	//init handler
+	userHandler := &httphandler.UserHttpHandler{
+		Cfg: serv.cfg,
+		UserRepository: &repository.UserRepository{
+			Client: serv.dbClient,
+		},
+	}
+
+	//init router
+	serv.app.GET("/api/user/:userId", userHandler.FindOneUser)
 }

@@ -26,12 +26,6 @@ func DBConn(cfg *config.Config) *mongo.Client {
 		log.Fatalf("failed to ping mongodb:%s with url: %s", err.Error(), cfg.Db.Url)
 	}
 
-	defer func() {
-		if err := client.Disconnect(context.Background()); err != nil {
-			panic(err)
-		}
-	}()
-
 	log.Printf("successful connected mongodb with url: %s \n", cfg.Db.Url)
 	return client
 }

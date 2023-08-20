@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/aom31/GO-Inventory/config"
@@ -12,6 +13,7 @@ func main() {
 	cfg := config.NewConfig("./.env.http.user")
 	//connect database
 	dbClient := db.DBConn(cfg)
+	defer dbClient.Disconnect(context.Background())
 
 	//start server
 	server.NewHttpServer(cfg, dbClient).StartHttpServer()
