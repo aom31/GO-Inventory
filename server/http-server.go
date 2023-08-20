@@ -1,1 +1,57 @@
 package server
+
+import (
+	"context"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"time"
+
+	"github.com/aom31/GO-Inventory/config"
+	"github.com/labstack/echo/v4"
+	"go.mongodb.org/mongo-driver/mongo"
+)
+
+type IHttpServer interface {
+
+	//StartHttpServer is func to start server app with echo and config
+	StartHttpServer()
+}
+
+type httpServer struct {
+	app      *echo.Echo
+	cfg      *config.Config
+	dbClient *mongo.Client
+}
+
+// constructure httpServer struct
+func NewHttpServer(cfg *config.Config, dbClient *mongo.Client) IHttpServer {
+	return &httpServer{
+		app:      echo.New(),
+		cfg:      cfg,
+		dbClient: dbClient,
+	}
+}
+
+func (serv *httpServer) StartHttpServer() {
+	log.Printf("starting server http with app url: %s", serv.cfg.App.Url)
+
+	// Start server
+	go func() {
+		if err := serv.app.Start(serv.cfg.App.Url); err != nil && err != http.ErrServerClosed {
+			serv.app.Logger.Fatal("shutting down the server")
+		}
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown the server with a timeout of 10 seconds.
+	// Use a buffered channel to avoid missing signals as recommended for signal.Notify
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := serv.app.Shutdown(ctx); err != nil {
+		serv.app.Logger.Fatal(err)
+	}
+}
