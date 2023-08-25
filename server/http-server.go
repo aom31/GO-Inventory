@@ -49,6 +49,11 @@ func (serv *httpServer) StartHttpServer() {
 		}
 	}()
 
+	//when shutdown server from any interupt , will recovery resouce
+	serv.graceFullShutdown()
+
+}
+func (serv *httpServer) graceFullShutdown() {
 	// Wait for interrupt signal to gracefully shutdown the server with a timeout of 10 seconds.
 	// Use a buffered channel to avoid missing signals as recommended for signal.Notify
 	quit := make(chan os.Signal, 1)
@@ -60,7 +65,6 @@ func (serv *httpServer) StartHttpServer() {
 		serv.app.Logger.Fatal(err)
 	}
 }
-
 func (serv *httpServer) RouteHttpHandle() {
 	//init handler
 	userHandler := &httphandler.UserHttpHandler{

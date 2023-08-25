@@ -6,4 +6,5 @@ const (
 	Collection_USERSITEMS = "users_items"
 
 	DBNAME_USER = "user_db"
+	DBNAME_ITEM = "item_db"
 )

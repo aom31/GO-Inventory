@@ -19,7 +19,7 @@ type UserRepository struct {
 }
 
 func (repo *UserRepository) FindOneUser(ctx context.Context, userId string) (*models.User, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*30)
 	defer cancel()
 
 	filterPipeline := filterQueryPipeline(userId)
