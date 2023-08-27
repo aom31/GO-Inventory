@@ -16,6 +16,11 @@ type ItemRepository struct {
 	Client *mongo.Client
 }
 
+func NewItemRepository(Client *mongo.Client) *ItemRepository {
+	return &ItemRepository{
+		Client: Client,
+	}
+}
 func (repo *ItemRepository) getCollectionDb() *mongo.Collection {
 	return repo.Client.Database(constants.DBNAME_ITEM).Collection(constants.Collection_ITEMS)
 }

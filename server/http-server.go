@@ -10,7 +10,7 @@ import (
 
 	"github.com/aom31/GO-Inventory/config"
 	httphandler "github.com/aom31/GO-Inventory/handler/httpHandler"
-	"github.com/aom31/GO-Inventory/src/repository"
+	"github.com/aom31/GO-Inventory/src/service"
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -68,12 +68,19 @@ func (serv *httpServer) graceFullShutdown() {
 func (serv *httpServer) RouteHttpHandle() {
 	//init handler
 	userHandler := &httphandler.UserHttpHandler{
-		Cfg: serv.cfg,
-		UserRepository: &repository.UserRepository{
-			Client: serv.dbClient,
-		},
+		Cfg:         serv.cfg,
+		Client:      serv.dbClient,
+		UserService: service.NewUserService(serv.dbClient),
+	}
+
+	itemHandler := &httphandler.ItemHttpHandler{
+		Cfg:         serv.cfg,
+		Client:      serv.dbClient,
+		ItemService: service.NewItemService(serv.dbClient),
 	}
 
 	//init router
 	serv.app.GET("/api/user/:userId", userHandler.FindOneUser)
+	serv.app.GET("/api/items", itemHandler.FindItems)
+	serv.app.GET("/api/item/:itemId", itemHandler.FindOneItem)
 }

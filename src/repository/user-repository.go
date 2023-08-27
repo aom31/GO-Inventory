@@ -18,6 +18,12 @@ type UserRepository struct {
 	Client *mongo.Client
 }
 
+func NewUserRepository(Client *mongo.Client) *UserRepository {
+	return &UserRepository{
+		Client: Client,
+	}
+}
+
 func (repo *UserRepository) FindOneUser(ctx context.Context, userId string) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second*30)
 	defer cancel()
