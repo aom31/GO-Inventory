@@ -15,11 +15,13 @@ type IItemService interface {
 }
 
 type itemService struct {
+	dbClient       *mongo.Client
 	itemRepository repository.ItemRepository
 }
 
 func NewItemService(Client *mongo.Client) IItemService {
 	return &itemService{
+		dbClient:       Client,
 		itemRepository: *repository.NewItemRepository(Client),
 	}
 }
